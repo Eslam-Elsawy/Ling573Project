@@ -12,9 +12,9 @@ def getFilePath(fileName):
 def getDirectoryPath(relativePath):
     return os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(relativePath)))
 
-SPECS_DIRECTORY = "../../doc/specs/"
-TOPICS_DIRECTORY = "../../doc/topics/"
-DOCUMENTS_DIRECTORY = "../../doc/documents/"
+SPECS_DIRECTORY = "../../input/specs/"
+TOPICS_DIRECTORY = "../../input/topics/"
+DOCUMENTS_DIRECTORY = "../../input/documents/"
 
 SPECS_TRAINING_FILEPATH = SPECS_DIRECTORY + "training/2009/UpdateSumm09_test_topics.xml"
 SPECS_DEVTEST_FILEPATH = SPECS_DIRECTORY + "devtest/GuidedSumm10_test_topics.xml"
@@ -42,12 +42,14 @@ def main():
     print(root.tag)
 
     for topic in root.findall('topic'):
+        topic_id = topic.get("id")
+        topic_directory_name = None
         for child in topic:
             if child.tag == "title":
                 if debug:
                     print(child.text.strip())
                 topic_name = child.text.strip()
-                topic_directory_name = topics_directory + topic_name
+                topic_directory_name = topics_directory + topic_id + "_" + topic_name
                 if not os.path.exists(topic_directory_name):
                     os.makedirs(topic_directory_name)
 
@@ -72,7 +74,7 @@ def main():
                         raise Exception('can not find document ' + document_name + " in file "+ document_file_name)
                     else:
 
-                        output_file_path = topics_directory + topic_name + "/" + document_name + ".xml"
+                        output_file_path = topic_directory_name + "/" + document_name + ".xml"
                         open(output_file_path, 'w+')
 
                         with io.open(output_file_path,'w', encoding='utf8') as outputFile:
