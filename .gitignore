@@ -1,3 +1,4 @@
 /input/documents/*
 .DS_Store
 /.idea/*
+src/datasetpreprocessing/.idea/workspace.xml

@@ -1,0 +1,1 @@
+./home2/eslam/ling573/evaluation/ROUGE/ROUGE-1.5.5.pl -e /home2/eslam/ling573/evaluation/ROUGE/data -a -n 4 -x -m -c 95 -r 1000 -f A -p 0.5 -t 0 -l 100 -s -d /home2/eslam/ling573/evaluation/config/d2/training/config.xml -> /home2/eslam/ling573/evaluation/output/d2/training/output.txt
