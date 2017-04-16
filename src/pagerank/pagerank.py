@@ -9,13 +9,13 @@ logging.info('Importing similarity')
 from src.similarity_measure import similarity
 logging.info('Finished importing similarity')
 
-def pagerank_algorithm(g, d = 0.85, epsilon = 0.00001, max_iterations = 1000):
+def pagerank_algorithm(g, d = 0.15, epsilon = 0.00001):
 	g = np.matrix(g)
 	N = g.shape[0]
 	logging.info('N={}'.format(N))
 
 	# Force sparsity and binarize
-	low_values = g < 0.2
+	low_values = g < d
 	g[low_values] = 0
 	g[~low_values] = 1
 	
