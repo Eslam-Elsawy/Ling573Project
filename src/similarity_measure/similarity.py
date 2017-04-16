@@ -4,6 +4,8 @@ from bs4 import BeautifulSoup
 import nltk
 from collections import defaultdict
 import math
+import logging
+logging.basicConfig(level = logging.INFO)
 
 class Sent_Extractor(object):
 
@@ -81,6 +83,7 @@ def main():
 	topic_dirs = os.listdir(TOPICS_TRAINING_DIRECTORY)
 	#get a list of all sentences from a topic directory and their adjacency matrix:
 	for topic_dir in topic_dirs:
+		logging.info(topic_dir)
 		path = TOPICS_TRAINING_DIRECTORY + "/" + topic_dir
 		if os.path.isdir(path):
 			extractor = Sent_Extractor(path)
