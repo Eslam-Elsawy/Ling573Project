@@ -39,23 +39,24 @@ def pagerank_algorithm(g, d = 0.15, epsilon = 0.00001):
 		
 	return p
 
-def main():
-	TOPICS_DIRECTORY = "../../input/topics/"
-	TOPICS_TRAINING_DIRECTORY = TOPICS_DIRECTORY + "/training/"
-	TOPICS_DEVTEST_DIRECTORY = TOPICS_DIRECTORY + "/devtest/"
+def rank(dataset = 'training'):
+	'''
+	dataset should be one of the following:
+		- 'training'
+		- 'devtest'
+	'''
 
-	output_dir = '../../outputs/pagerank/devtest'	
+	input_dir = os.path.join('../../input/topics', dataset)
+	output_dir = os.path.join('../../outputs/pagerank', dataset)
 
-	topic_dirs = os.listdir(TOPICS_TRAINING_DIRECTORY)
-	topic_dirs = os.listdir(TOPICS_DEVTEST_DIRECTORY)
-	#get a list of all sentences from a topic directory and their adjacency matrix:
+	topic_dirs = os.listdir(input_dir)
 	for topic_dir in topic_dirs:
 		topic_id = topic_dir.split('_')[0]
 		logging.info(topic_id)
-		path = TOPICS_DEVTEST_DIRECTORY + "/" + topic_dir
-		if os.path.isdir(path):
+		topic_path = os.path.join(input_dir, topic_dir)
+		if os.path.isdir(topic_path):
 			logging.info('Extracting sentences')
-			extractor = similarity.Sent_Extractor(path)
+			extractor = similarity.Sent_Extractor(topic_path)
 			all_sents = extractor.extract_sentences()
 			logging.info('Calculating similarity')
 			sim_matrix = similarity.build_sim_matrix(all_sents)
@@ -65,6 +66,14 @@ def main():
 				sentences = [all_sents[ix] for ix in ranks]
 				sentences = '\n'.join(sentences)
 				f.write(sentences)
+
+def main():
+	logging.info('Ranking training data')
+	rank('training')
+
+	logging.info('Ranking devtest data')
+	rank('devtest')
+
 
 if __name__ == "__main__":
     main()
