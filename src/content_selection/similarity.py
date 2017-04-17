@@ -38,52 +38,6 @@ def build_sim_matrix(sentences):
 	dtf_matrix = vectorizer.fit_transform(sentences)
 	return cosine_similarity(dtf_matrix)
 	
-'''
-class Similarity_Matrix(object):
-
-	def __init__(self, sentences):
-		""" initiates the adjacency matrix """
-		self.sentences = sentences
-		self.vectorizer = CountVectorizer()
-		self.doc_term_freq_matrix = self.vectorizer.fit_transform()
-		self.sim_matrix = cosine_similarity(self.doc_term_freq_matrix)
-	
-	def vectorize_sent(self, sent):
-		""" Vectorizes each sentence into a hash of words to word counts """
-		vector = defaultdict(int)
-		words = nltk.word_tokenize(sent)
-		for word in words:
-			vector[word]+=1
-		return vector
-	
-	def cosine_sim(self, sent1, sent2):
-		""" Calculates cosine similarity between 2 sentences """
-		vec2 = self.vectorize_sent(sent2)
-		all_words = set(vec1.keys()).union(set(vec2.keys()))
-		dot_product = 0
-		mag1 = 0
-		mag2 = 0
-		for word in all_words:
-			v1 = vec1[word]
-			v2 = vec2[word]
-			dot_product += v1*v2
-			mag1 += v1**2
-			mag2 += v2**2
-		mag1 = math.sqrt(mag1)
-		mag2 = math.sqrt(mag2)
-		cosine = float(dot_product)/(mag1*mag2)
-		return cosine
-
-	def fill_adj_matrix(self):
-		""" Fills the adjacency matrix """
-		for i in range(self.matrix_size):
-			for j in range(self.matrix_size):
-				sentence1 = self.sentences[i]
-				sentence2 = self.sentences[j]
-				similarity = self.cosine_sim(sentence1, sentence2)
-				self.adj_matrix[i][j] = similarity
-'''
-	
 def main():
 	TOPICS_DIRECTORY = "../../input/topics/"
 	TOPICS_TRAINING_DIRECTORY = TOPICS_DIRECTORY + "/training/"

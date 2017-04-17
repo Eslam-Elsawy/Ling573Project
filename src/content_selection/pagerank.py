@@ -44,14 +44,15 @@ def main():
 	TOPICS_TRAINING_DIRECTORY = TOPICS_DIRECTORY + "/training/"
 	TOPICS_DEVTEST_DIRECTORY = TOPICS_DIRECTORY + "/devtest/"
 
-	output_dir = '../../outputs/pagerank/training'	
+	output_dir = '../../outputs/pagerank/devtest'	
 
 	topic_dirs = os.listdir(TOPICS_TRAINING_DIRECTORY)
+	topic_dirs = os.listdir(TOPICS_DEVTEST_DIRECTORY)
 	#get a list of all sentences from a topic directory and their adjacency matrix:
 	for topic_dir in topic_dirs:
 		topic_id = topic_dir.split('_')[0]
 		logging.info(topic_id)
-		path = TOPICS_TRAINING_DIRECTORY + "/" + topic_dir
+		path = TOPICS_DEVTEST_DIRECTORY + "/" + topic_dir
 		if os.path.isdir(path):
 			logging.info('Extracting sentences')
 			extractor = similarity.Sent_Extractor(path)
