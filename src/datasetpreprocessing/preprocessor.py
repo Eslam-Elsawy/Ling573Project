@@ -1,6 +1,7 @@
 import io
 import os
 import xml.etree.ElementTree as ET
+import lxml.etree as etree
 
 debug = True
 
@@ -26,7 +27,7 @@ class DatasetType:
 
 def main():
     global debug
-    dataset_type = DatasetType.training
+    dataset_type = DatasetType.devtest
     specs_file_path = ""
     topics_directory = ""
 
@@ -61,14 +62,26 @@ def main():
                     document_file_name = doc.get("id").split(".")[0]
                     if "_" in document_file_name:
                         document_file_name = document_file_name[:-2] + ".xml"
+                    else:
+                        document_file_name = document_file_name + ".xml"
 
+                    #parser = ET.XMLParser(recover=True)
                     tree = ET.parse(getFilePath(DOCUMENTS_DIRECTORY + document_file_name))
 
                     found_doc = None
-                    for xmldoc in tree.getroot():
-                        if xmldoc.get("id") == document_name:
-                            found_doc = xmldoc
-                            break
+                    if "_" in document_file_name:
+                        for xmldoc in tree.getroot():
+                            if xmldoc.get("id") == document_name:
+                                found_doc = xmldoc
+                                break
+                    else:
+                        for body in tree.getroot():
+                            for docstream in body:
+                                for topic_doc in docstream:
+                                    for topic_doc_child in topic_doc:
+                                        if topic_doc_child.tag == "docno" and topic_doc_child.text.strip() == document_name:
+                                            found_doc = topic_doc
+                                            break
 
                     if found_doc is None:
                         raise Exception('can not find document ' + document_name + " in file "+ document_file_name)

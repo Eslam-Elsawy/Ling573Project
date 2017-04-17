@@ -2,3 +2,9 @@
 .DS_Store
 /.idea/*
 src/datasetpreprocessing/.idea/workspace.xml
+
+*.iml
+
+src/datasetpreprocessing/.idea/misc.xml
+
+src/datasetpreprocessing/.idea/DatasetPreprocessing.iml
