@@ -5,7 +5,7 @@ import numpy as np
 import nltk
 from collections import defaultdict
 import math
-from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 import logging
 logging.basicConfig(level = logging.INFO)
@@ -34,7 +34,11 @@ class Sent_Extractor(object):
 
 
 def build_sim_matrix(sentences):
-	vectorizer = CountVectorizer()
+	#vectorizer = CountVectorizer(min_df = 5, max_df = 0.5, binary = True, stop_words = 'english')
+	#vectorizer = CountVectorizer(binary = True, ngram_range = (1,3))
+	#vectorizer = CountVectorizer(binary = True, ngram_range = (1,3), max_df = 0.4)
+	#vectorizer = TfidfVectorizer(ngram_range = (1,3), binary = True)
+	vectorizer = TfidfVectorizer()
 	dtf_matrix = vectorizer.fit_transform(sentences)
 	return cosine_similarity(dtf_matrix)
 	

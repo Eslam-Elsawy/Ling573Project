@@ -17,8 +17,8 @@ def pagerank_algorithm(g, d = 0.15, epsilon = 0.00001):
 
 	# Force sparsity and binarize
 	low_values = g < d
-	g[low_values] = 0
-	g[~low_values] = 1
+	g[low_values] = 0.0
+	g[~low_values] = 1.0
 	
 	# Initialize values
 	deg = np.zeros(N)
@@ -58,6 +58,7 @@ def rank(dataset = 'training'):
 			logging.info('Extracting sentences')
 			extractor = similarity.Sent_Extractor(topic_path)
 			all_sents = extractor.extract_sentences()
+			all_sents = [x for x in all_sents if len(x) >= 35]
 			logging.info('Calculating similarity')
 			sim_matrix = similarity.build_sim_matrix(all_sents)
 			ranks = pagerank_algorithm(sim_matrix)
