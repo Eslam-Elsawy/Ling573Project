@@ -47,7 +47,7 @@ def rank(dataset = 'training'):
 	'''
 
 	input_dir = os.path.join('../../input/topics', dataset)
-	output_dir = os.path.join('../../outputs/pagerank', dataset)
+	output_dir = os.path.join('../../outputs/pagerank_cosine', dataset)
 
 	topic_dirs = os.listdir(input_dir)
 	for topic_dir in topic_dirs:
