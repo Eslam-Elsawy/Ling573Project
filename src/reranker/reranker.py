@@ -43,11 +43,16 @@ def cosine(document1, document2, idf):
 
 def main():
     input_directoryPath = getDirectoryPath("../../outputs/pagerank_cosine/devtest/")
-    output_directoryPath = getDirectoryPath("../../outputs/reranker/devtest/")
+    output_directoryPath = getDirectoryPath("../../outputs/D2/")
     for filename in os.listdir(input_directoryPath):
         print("Reranking sentences in file: " +filename)
         input_file_path = input_directoryPath + "/" + filename
-        output_file_path = output_directoryPath + "/" + filename
+
+        # get the output file name
+        id_part1 = filename[:-1]
+        id_part2 = filename[-1:]
+        output_file_name = id_part1 + "-A.M.100." + id_part2 + ".1"
+        output_file_path = output_directoryPath + "/" + output_file_name
 
         # calculate idf of all terms in all sentences in the document
         # count the number of sentences and get the unique set of words
