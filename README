@@ -1,0 +1,11 @@
+# Ling573Project
+Summarization System 
+
+# Run instructions
+run "./D2.cmd" command from the root of the project
+
+The system input is under "/input/topics/devtest" or "/input/topics/training" directories, this input was prepared by running several preprocessing steps on AQUAINT and AQUAINT-2 corpora. The logic for preprocessing can be found under "/src/datasetpreprocessing" directory
+
+The script first runs the content selection module "/src/content_selection/pagerank.py" the output for this module will be under "/outputs/pagerank_cosine/devtest"
+
+The script then runs the reranker module "/src/reranker/reranker.py" the output for this module will be under "outputs/D2/"
