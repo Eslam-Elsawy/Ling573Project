@@ -4,7 +4,7 @@ Summarization System
 # Run instructions
 ==================
 On patas, go to "/home2/eslam/ling573/D2" shared directory
-run "./D2.cmd" command
+run "condor_submit D2.cmd" command
 
 # More details:
 ===============

@@ -39,11 +39,11 @@ def pagerank_algorithm(g, d = 0.15, epsilon = 0.00001):
 	return p
 
 def main():
-	TOPICS_DIRECTORY = "../../input/topics/"
+	TOPICS_DIRECTORY = "src/input/topics/"
 	TOPICS_TRAINING_DIRECTORY = TOPICS_DIRECTORY + "/training/"
 	TOPICS_DEVTEST_DIRECTORY = TOPICS_DIRECTORY + "/devtest/"
 
-	output_dir = '../../outputs/pagerank/training'	
+	output_dir = 'src/outputs/pagerank/training'	
 
 	topic_dirs = os.listdir(TOPICS_TRAINING_DIRECTORY)
 	#get a list of all sentences from a topic directory and their adjacency matrix:

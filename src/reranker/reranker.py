@@ -42,8 +42,8 @@ def cosine(document1, document2, idf):
     return float(dot_product) / float(vectorLength(vec1) * vectorLength(vec2))
 
 def main():
-    input_directoryPath = getDirectoryPath("../../outputs/pagerank_cosine/devtest/")
-    output_directoryPath = getDirectoryPath("../../outputs/D2/")
+    input_directoryPath = getDirectoryPath("outputs/pagerank_cosine/devtest/")
+    output_directoryPath = getDirectoryPath("outputs/D2/")
     for filename in os.listdir(input_directoryPath):
         print("Reranking sentences in file: " +filename)
         input_file_path = input_directoryPath + "/" + filename
