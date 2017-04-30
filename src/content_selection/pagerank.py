@@ -47,7 +47,7 @@ def rank(dataset = 'training'):
 	'''
 
 	input_dir = os.path.join('input/topics', dataset)
-	output_dir = os.path.join('outputs/pagerank_cosine', dataset)
+	output_dir = os.path.join('outputs/pagerank_D3', dataset)
 
 	topic_dirs = os.listdir(input_dir)
 	for topic_dir in topic_dirs:
@@ -69,8 +69,8 @@ def rank(dataset = 'training'):
 				f.write(sentences)
 
 def main():
-	logging.info('Ranking training data')
-	rank('training')
+	#logging.info('Ranking training data')
+	#rank('training')
 
 	logging.info('Ranking devtest data')
 	rank('devtest')
