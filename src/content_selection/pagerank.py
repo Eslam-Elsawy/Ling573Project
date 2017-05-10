@@ -6,7 +6,6 @@ import logging
 logging.basicConfig(level = logging.INFO)
 
 logging.info('Importing similarity')
-#from src.similarity_measure import similarity
 import similarity
 logging.info('Finished importing similarity')
 
@@ -46,10 +45,11 @@ def rank(dataset = 'training'):
 		- 'devtest'
 	'''
 
-	input_dir = os.path.join('input/topics', dataset)
-	output_dir = os.path.join('outputs/pagerank_D3', dataset)
+	input_dir = os.path.join('../../input/topics', dataset)
+	output_dir = os.path.join('../../outputs/pagerank_D3', dataset)
 
 	topic_dirs = os.listdir(input_dir)
+	ranked_sentences = {}
 	for topic_dir in topic_dirs:
 		topic_id = topic_dir.split('_')[0]
 		logging.info(topic_id)
@@ -58,19 +58,21 @@ def rank(dataset = 'training'):
 			logging.info('Extracting sentences')
 			extractor = similarity.Sent_Extractor(topic_path)
 			all_sents = extractor.extract_sentences()
-			all_sents = [x for x in all_sents if len(x) >= 35]
 			logging.info('Calculating similarity')
-			sim_matrix = similarity.build_sim_matrix(all_sents)
+			sim_matrix = similarity.build_sim_matrix(sent.original_sent for sent in all_sents)
 			ranks = pagerank_algorithm(sim_matrix)
 			ranks = np.argsort(ranks)[::-1]
+			ranked_sent_objects = [all_sents[ix] for ix in ranks]
 			with open(os.path.join(output_dir, topic_id), 'w') as f:
-				sentences = [all_sents[ix] for ix in ranks]
+				sentences = [all_sents[ix].original_sent for ix in ranks]
 				sentences = '\n'.join(sentences)
 				f.write(sentences)
+			ranked_sentences[topic_id] = ranked_sent_objects
+	return ranked_sentences
 
 def main():
-	#logging.info('Ranking training data')
-	#rank('training')
+	logging.info('Ranking training data')
+	rank('training')
 
 	logging.info('Ranking devtest data')
 	rank('devtest')

@@ -3,7 +3,11 @@ __author__ = 'eslamelsawy'
 import io
 import os
 import math
-
+import logging
+import re
+import sys
+sys.path.append('../content_selection/')
+import pagerank
 THRESHOLD = 0.2
 
 def getFilePath(fileName):
@@ -41,39 +45,38 @@ def cosine(document1, document2, idf):
 
     return float(dot_product) / float(vectorLength(vec1) * vectorLength(vec2))
 
-def main():
+def select_top(dataset = 'training'):
+    meta_regex = re.compile(r'^([A-Z]{2,}.{,25}\(.{,25}\))|^([A-Z\s]{2,}(\_|\-))')
+    ranked_sentences = pagerank.rank(dataset)
     input_directoryPath = getDirectoryPath("outputs/pagerank_D3/devtest/")
-    output_directoryPath = getDirectoryPath("outputs/D3/")
-    for filename in os.listdir(input_directoryPath):
-        print("Reranking sentences in file: " +filename)
-        input_file_path = input_directoryPath + "/" + filename
-
-        # get the output file name
-        id_part1 = filename[:-1]
-        id_part2 = filename[-1:]
+    output_directoryPath = getDirectoryPath("../../outputs/reranker/devtest/")
+    top_sents = {}
+    for topic_id in ranked_sentences.keys():
+        sentences = ranked_sentences[topic_id]
+        id_part1 = topic_id[:-1]
+        id_part2 = topic_id[-1:]
         output_file_name = id_part1 + "-A.M.100." + id_part2 + ".1"
         output_file_path = output_directoryPath + "/" + output_file_name
 
-        # calculate idf of all terms in all sentences in the document
-        # count the number of sentences and get the unique set of words
         vocab = set()
-        sentences = []
-        with io.open(input_file_path, 'r', encoding='utf8') as inputFile:
-            for line in inputFile:
-                sentences.append(line)
-                splitted = line.split()
-                for word in splitted:
-                    vocab.add(word.lower())
-        inputFile.close()
+        for sentence in sentences:
 
-        # calculate idf
+
+            original = sentence.original_sent
+            match = re.search(meta_regex, original)
+            clean = re.sub(meta_regex, '', original).replace('--', '').lower()
+            sentence.clean_sent = clean
+            splitted = clean.split()
+            for word in splitted:
+                vocab.add(word.lower())
+
         vocab_sentences_count = {}
         for word in vocab:
             vocab_sentences_count[word] = 0
 
         for sentence in sentences:
             unique_terms = set()
-            for word in sentence.lower().split():
+            for word in sentence.clean_sent.split():
                 unique_terms.add(word)
 
             for word in unique_terms:
@@ -85,28 +88,50 @@ def main():
 
         chosen_sentences = []
         total_word_count = 0
-        for sentence in sentences:
+        for sent_obj in sentences:
+            sentence = sent_obj.clean_sent
             if total_word_count + len(sentence.split()) > 100:
                 continue
 
             # decide whether or not to include the sentence based on the cosine similarity
             include_sentence = True
-            for chosen_sentence in chosen_sentences:
+            for chosen_sentence_obj in chosen_sentences:
+                chosen_sentence = chosen_sentence_obj.clean_sent
                 cosine_score = cosine(sentence.lower(), chosen_sentence.lower(), idf)
                 if cosine_score > THRESHOLD:
                     include_sentence = False
                     break
 
             if include_sentence:
-                chosen_sentences.append(sentence)
-                total_word_count += len(sentence.split())
+                #exclude quotes:
+                if not sent_obj.clean_sent.startswith('\'\'') and not sent_obj.clean_sent.startswith('``'):
+                    chosen_sentences.append(sent_obj)
+                    total_word_count += len(sentence.split())
 
-        with io.open(output_file_path,'w', encoding='utf8') as outputFile:
-            for sentence in chosen_sentences:
-                outputFile.write(sentence)
-            outputFile.flush()
-        outputFile.close()
+            with io.open(output_file_path,'w', encoding='utf8') as outputFile:
+                for sentence in chosen_sentences:
+                    outputFile.write(sentence.clean_sent)
+                    outputFile.write(' ')
+                outputFile.flush()
+            outputFile.close()
 
-main()
+            top_sents[topic_id] = chosen_sentences
+
+    return top_sents
+
+
+
+
+
+def main():
+    #logging.info('Ranking training data')
+    #select_top('training')
+
+    logging.info('Ranking devtest data')
+    select_top('devtest')
+
+
+if __name__ == "__main__":
+    main()
 
 
