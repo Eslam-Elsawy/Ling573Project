@@ -11,7 +11,7 @@ logging.info('Importing similarity')
 import doc2vec_similarity
 logging.info('Finished importing similarity')
 
-def pagerank_algorithm(g, d = 0.15, epsilon = 0.00001):
+def pagerank_algorithm(g, d = 0.25, epsilon = 0.00001):
 	g = np.matrix(g)
 	N = g.shape[0]
 	logging.info('N={}'.format(N))
@@ -49,7 +49,7 @@ def rank(dataset = 'training'):
 	model_file = 'models/reuters_model.doc2vec'
 	model = models.Doc2Vec.load(model_file)
 	input_dir = os.path.join('../../input/topics', dataset)
-	output_dir = os.path.join('../../outputs/pagerank', dataset)
+	output_dir = os.path.join('../../outputs/pagerank_doc2vec', dataset)
 
 	topic_dirs = os.listdir(input_dir)
 	
