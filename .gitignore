@@ -18,3 +18,11 @@ src/reranker/.idea/workspace.xml
 src/content_selection/__pycache__/similarity.cpython-36.pyc
 
 src/content_selection/__pycache__/similarity.cpython-36.pyc
+
+src/entitybasedreranker/.idea/misc.xml
+
+src/entitybasedreranker/.idea/modules.xml
+
+src/entitybasedreranker/.idea/workspace.xml
+
+src/entitybasedreranker/stanford-parser-3.7.0-models.jar
