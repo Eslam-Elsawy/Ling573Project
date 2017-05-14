@@ -11,7 +11,6 @@ from collections import defaultdict
 import datetime
 from itertools import permutations
 import sys
-sys.path.append('../reranker/')
 import reranker
 
 def getFilePath(fileName):
@@ -27,7 +26,7 @@ def chron_order(dataset = 'training'):
 
     top_sentences = reranker.select_top(dataset)
     input_directoryPath = getDirectoryPath("outputs/reranker/devtest/")
-    output_directoryPath = getDirectoryPath("../../outputs/reorder/devtest/")
+    output_directoryPath = getDirectoryPath("outputs/reorder/devtest/")
     chron_sents = {}
     for topic_id in top_sentences.keys():
         sentences = top_sentences[topic_id]
@@ -63,7 +62,7 @@ def chron_order(dataset = 'training'):
 def cohesion_order(dataset = 'training'):
     top_sentences = reranker.select_top(dataset)
     input_directoryPath = getDirectoryPath("outputs/reranker/devtest/")
-    output_directoryPath = getDirectoryPath("../../outputs/reorder/devtest/")
+    output_directoryPath = getDirectoryPath("outputs/reorder/devtest/")
     cohesion_sents = {}
     
     for topic_id in top_sentences.keys():

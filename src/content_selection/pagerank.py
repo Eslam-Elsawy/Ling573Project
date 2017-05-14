@@ -1,6 +1,4 @@
 import os
-#import sys
-#sys.path.append('../..')
 import numpy as np
 import logging
 logging.basicConfig(level = logging.INFO)
@@ -45,8 +43,8 @@ def rank(dataset = 'training'):
 		- 'devtest'
 	'''
 
-	input_dir = os.path.join('../../input/topics', dataset)
-	output_dir = os.path.join('../../outputs/pagerank_D3', dataset)
+	input_dir = os.path.join('input/topics', dataset)
+	output_dir = os.path.join('outputs/pagerank_D3', dataset)
 
 	topic_dirs = os.listdir(input_dir)
 	ranked_sentences = {}
