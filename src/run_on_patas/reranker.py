@@ -64,6 +64,7 @@ def select_top(dataset = 'training'):
             original = sentence.original_sent
             match = re.search(meta_regex, original)
             clean = re.sub(meta_regex, '', original).replace('--', '').lower()
+            sentence.original_sent = re.sub(meta_regex, '', original).replace('--', '')
             sentence.clean_sent = clean
             splitted = clean.split()
             for word in splitted:
@@ -109,7 +110,7 @@ def select_top(dataset = 'training'):
 
             with io.open(output_file_path,'w', encoding='utf8') as outputFile:
                 for sentence in chosen_sentences:
-                    outputFile.write(sentence.clean_sent)
+                    outputFile.write(sentence.original_sent)
                     outputFile.write(' ')
                 outputFile.flush()
             outputFile.close()

@@ -9,6 +9,8 @@ import math
 import re
 from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
+from nltk.stem.snowball import SnowballStemmer
+from nltk.tokenize import wordpunct_tokenize
 import logging
 logging.basicConfig(level = logging.INFO)
 
@@ -33,6 +35,8 @@ class Sent_Extractor(object):
 		topic_id = self.dir_path.split('/')[-1].split('_')[0]
 
 		time_regex = re.compile(r'([\d]{2}):([\d]{2})')
+		meta_regex = re.compile(r'^([A-Z]{2,}.{,25}\(.{,25}\))|^([A-Z\s]{2,}(\_|\-))')
+		web_regex = re.compile(r'www.')
 
 		for file_name in files:
 			file_path = self.dir_path + '/' + file_name
@@ -55,15 +59,22 @@ class Sent_Extractor(object):
 					paragraph_text = par.text.strip().replace('\n', ' ').replace('  ', ' ')
 					paragraph_sents = nltk.sent_tokenize(paragraph_text)
 					for i, sent in enumerate(paragraph_sents):
-						if len(sent)>35:
-							all_sentences.append(Sentence(sent, timestamp, i))
+						if len(sent) > 35:
+							phone_number_regex = re.compile('[0-9][0-9][0-9]-[0-9][0-9][0-9][0-9]')
+							if re.search(phone_number_regex, sent) == None and re.search(web_regex, sent) == None:
+								sent = re.sub(meta_regex, '', sent).replace('--', '')
+								all_sentences.append(Sentence(sent, timestamp, i))
 
 		return all_sentences
 
 
 def build_sim_matrix(sentences):
-	vectorizer = TfidfVectorizer()
-	dtf_matrix = vectorizer.fit_transform(sentences)
+	stemmer = SnowballStemmer("english")
+	stemmed_sentences = [wordpunct_tokenize(sent) for sent in sentences]
+	stemmed_sentences = [[stemmer.stem(token) for token in sent] for sent in stemmed_sentences]
+	stemmed_sentences = [' '.join(sent) for sent in stemmed_sentences]
+	vectorizer = TfidfVectorizer(binary = True)
+	dtf_matrix = vectorizer.fit_transform(stemmed_sentences)
 	return cosine_similarity(dtf_matrix)
 	
 def main():
