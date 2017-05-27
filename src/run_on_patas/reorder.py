@@ -95,7 +95,7 @@ def cohesion_order(dataset = 'training'):
         with io.open(output_file_path,'w', encoding='utf8') as outputFile:
             for sentence in cohesion_list:
                 outputFile.write(sentence.original_sent)
-                outputFile.write(' ')
+                outputFile.write('\n')
             outputFile.flush()
         outputFile.close()
 

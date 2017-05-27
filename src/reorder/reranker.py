@@ -110,7 +110,7 @@ def select_top(dataset = 'training'):
             with io.open(output_file_path,'w', encoding='utf8') as outputFile:
                 for sentence in chosen_sentences:
                     outputFile.write(sentence.clean_sent)
-                    outputFile.write(' ')
+                    outputFile.write('\n')
                 outputFile.flush()
             outputFile.close()
 
