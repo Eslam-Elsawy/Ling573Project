@@ -61,7 +61,7 @@ class Sent_Extractor(object):
 					for i, sent in enumerate(paragraph_sents):
 						if len(sent) > 35:
 							phone_number_regex = re.compile('[0-9][0-9][0-9]-[0-9][0-9][0-9][0-9]')
-							if re.search(phone_number_regex, sent) == None and re.search(web_regex, sent) == None:
+							if re.search(phone_number_regex, sent) == None and re.search(web_regex, sent) == None and '?' not in sent:
 								sent = re.sub(meta_regex, '', sent).replace('--', '')
 								all_sentences.append(Sentence(sent, timestamp, i))
 

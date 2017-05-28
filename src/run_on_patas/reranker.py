@@ -7,6 +7,7 @@ import logging
 import re
 import sys
 import pagerank
+import nltk
 THRESHOLD = 0.2
 
 def getFilePath(fileName):
@@ -44,6 +45,37 @@ def cosine(document1, document2, idf):
 
     return float(dot_product) / float(vectorLength(vec1) * vectorLength(vec2))
 
+def compress(sentence):
+
+    tokenized = nltk.word_tokenize(sentence.lower())
+
+    tagged = nltk.pos_tag(tokenized)
+    initial_pos = tagged[0][1]
+    if initial_pos == 'CC' or initial_pos == 'RB':
+        first_space = sentence.index(' ')
+        sentence = sentence[first_space+1:]
+        sentence = sentence[0].upper() + sentence[1:]
+    
+
+
+    #said_regex = re.compile(r'(,[^,]*(said|says|according).*?(,(( who).*?(,|\.))?|\.))')
+
+    #match = re.search(said_regex, sentence)
+    #if match:
+        #if match.group(1).endswith('.'):
+            #sentence = re.sub(said_regex, '.', sentence)
+                    
+        #else:
+            #sentence = re.sub(said_regex, ' ', sentence)
+
+    parens_reg = re.compile(r'\(.*?\)')
+    sentence = re.sub(parens_reg, '', sentence)
+    age_regex = re.compile(r', [0-9][0-9],|, aged [0-9][0-9],')
+    sentence = re.sub(age_regex, '', sentence)
+    sentence = re.sub('  ', ' ', sentence)
+
+    return sentence
+
 def select_top(dataset = 'training'):
     meta_regex = re.compile(r'^([A-Z]{2,}.{,25}\(.{,25}\))|^([A-Z\s]{2,}(\_|\-))')
     ranked_sentences = pagerank.rank(dataset)
@@ -65,6 +97,7 @@ def select_top(dataset = 'training'):
             match = re.search(meta_regex, original)
             clean = re.sub(meta_regex, '', original).replace('--', '').lower()
             sentence.original_sent = re.sub(meta_regex, '', original).replace('--', '')
+            sentence.original_sent = compress(sentence.original_sent)
             sentence.clean_sent = clean
             splitted = clean.split()
             for word in splitted:
