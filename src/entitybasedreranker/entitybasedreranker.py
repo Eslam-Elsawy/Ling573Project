@@ -5,45 +5,43 @@ import os
 from nltk.tag.stanford import StanfordNERTagger
 from nltk.parse.stanford import StanfordDependencyParser
 from random import randint
-from sklearn import svm
 from bs4 import BeautifulSoup
 import nltk
 from sklearn.neighbors import KNeighborsClassifier
+import reranker
+import logging
 
-
-def main():
-    input_and_output_directoryPath = getDirectoryPath("../../outputs/D3/")
+def entitygrid_reorder(dataset = 'training'):
+    output_directoryPath = getDirectoryPath("outputs/D3/")
     model_file_path = getFilePath("model")
+    KNN = 11
+    number_of_random_orders = 20
 
     # reading model
     vectors, labels = readModel(model_file_path)
 
     # building calssifier
-    neigh = KNeighborsClassifier(n_neighbors=11)
+    neigh = KNeighborsClassifier(n_neighbors=KNN)
     neigh.fit(vectors, labels)
 
+    # NER + Dep parser
     ner_tagger = loadStanfordNERTagger()
     stanford_dependency_parser = loadStanfordDependencyParser()
 
-    for filename in os.listdir(input_and_output_directoryPath):
+    # page rank + cosine reordering
+    top_sentences = reranker.select_top(dataset)
 
-        if filename.startswith(".") or filename.endswith(".reordered"):
-            continue
+    for topic_id in top_sentences.keys():
+        sentences = top_sentences[topic_id]
+        id_part1 = topic_id[:-1]
+        id_part2 = topic_id[-1:]
+        output_file_name = id_part1 + "-A.M.100." + id_part2 + ".1"
+        output_file_path = output_directoryPath + "/" + output_file_name
 
-        summary_file_path = getFilePath(input_and_output_directoryPath+"/"+filename)
-        output_file_path = getFilePath(input_and_output_directoryPath+"/"+filename+".reordered")
-        number_of_random_orders = 20
-
-        # reading content selection output
         print("summary ....")
-        sentences = []
-        with io.open(summary_file_path, 'r', encoding='utf8') as inputFile:
-            for line in inputFile:
-                sublines = line.split(".")
-                for sub in sublines:
-                    if sub.strip():
-                       sentences.append(sub.strip())
-        inputFile.close()
+        sentences = [sentence.clean_sent.strip() for sentence in sentences]
+        for s in sentences:
+            print(s)
 
         sent_ent_matrix = generateMatrixForSummary(sentences, ner_tagger, stanford_dependency_parser)
 
@@ -89,14 +87,8 @@ def main():
 
         # print best order to the output file
         with io.open(output_file_path, 'w', encoding='utf8') as outputFile:
-            first = True
             for order in best_order:
-                if first:
-                    first = False
-                    summary = sentences[order]
-                    continue
-                summary = summary + ". " + sentences[order]
-            outputFile.write(summary)
+                outputFile.write(sentences[order]+"\n")
             outputFile.flush()
         outputFile.close()
 
@@ -451,31 +443,14 @@ class Sent_Extractor(object):
             print(len(all_sentences))
         return all_sentences
 
-main()
+
 #train()
 
-
-# for filename in os.listdir(input_directoryPath):
-
-# if filename.startswith("."):
-#    continue
-# print("Reranking sentences in file: " +filename)
-# input_file_path = input_directoryPath + "/" + filename
-
-# get the output file name
-# id_part1 = filename[:-1]
-# id_part2 = filename[-1:]
-# output_file_name = id_part1 + "-A.M.100." + id_part2 + ".1"
-# output_file_path = output_directoryPath + "/" + output_file_name
+def main():
+    logging.info('Reordering using entity grid')
+    entitygrid_reorder('devtest')
 
 
-# reading content selection output
-# print("summary ....")
-# sentences = []
-# with io.open(input_file_path, 'r', encoding='utf8') as inputFile:
-#    for line in inputFile:
-#        sublines = line.split(".")
-#        for sub in sublines:
-#            if sub.strip():
-#               sentences.append(sub)
-# inputFile.close()
+if __name__ == "__main__":
+    main()
+
