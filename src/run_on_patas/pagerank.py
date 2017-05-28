@@ -44,9 +44,9 @@ def rank(dataset = 'training'):
 	'''
 
 	input_dir = os.path.join('input/topics', dataset)
-	output_dir = os.path.join('outputs/pagerank_D3', dataset)
-	age_regex = re.compile(r', [0-9]+,')
-	acronym_regex = re.compile(r'([A-Z]+)')
+	output_dir = os.path.join('outputs/pagerank_D4', dataset)
+	#age_regex = re.compile(r', [0-9]+,')
+	#acronym_regex = re.compile(r'([A-Z]+)')
 
 	topic_dirs = os.listdir(input_dir)
 	ranked_sentences = {}
@@ -65,8 +65,8 @@ def rank(dataset = 'training'):
 			ranked_sent_objects = [all_sents[ix] for ix in ranks]
 			with open(os.path.join(output_dir, topic_id), 'w') as f:
 				sentences = [all_sents[ix].original_sent for ix in ranks] #if '``' not in all_sents[ix].original_sent]
-				sentences = [re.sub(age_regex, '', x) for x in sentences]
-				sentences = [re.sub(acronym_regex, '', x) for x in sentences]
+				#sentences = [re.sub(age_regex, '', x) for x in sentences]
+				#sentences = [re.sub(acronym_regex, '', x) for x in sentences]
 				sentences = '\n'.join(sentences)
 				f.write(sentences)
 			ranked_sentences[topic_id] = ranked_sent_objects
@@ -78,6 +78,8 @@ def main():
 
 	logging.info('Ranking devtest data')
 	rank('devtest')
+	logging.info('Ranking eval data')
+	rank('eval')
 
 
 if __name__ == "__main__":

@@ -12,42 +12,48 @@ from sklearn.neighbors import KNeighborsClassifier
 import logging
 logging.basicConfig(level = logging.INFO)
 
-def main():
-    input_directoryPath = "outputs/reranker/devtest"
-    output_directoryPath = "outputs/D3"
-    model_file_path = 'src/run_on_patas/model'
+def entity_reranker(dataset = 'training'):
+    logging.info('Running {} entity reranker'.format(dataset))
+    input_directoryPath = os.path.join('outputs/reranker_D4', dataset)
+    output_directoryPath = os.path.join('outputs/entity_reranker_D4', dataset)
+    model_file_path = '../model'
 
     # reading model
+    logging.info('Reading model')
     vectors, labels = readModel(model_file_path)
 
     # building calssifier
+    logging.info('Building KNN Classifier')
     neigh = KNeighborsClassifier(n_neighbors=11)
     neigh.fit(vectors, labels)
 
+    logging.info('Loading NER tagger')
     ner_tagger = loadStanfordNERTagger()
+    logging.info('Loading Stanford dependency parser')
     stanford_dependency_parser = loadStanfordDependencyParser()
-
+       
+    logging.info('Reading content selection output') 
     for filename in os.listdir(input_directoryPath):
 
         if filename.startswith(".") or filename.endswith(".reordered"):
             continue
 
-        summary_file_path = input_directoryPath+"/"+filename
+        summary_file_path = os.path.join(input_directoryPath, filename)
         logging.info(summary_file_path)
-        output_file_path = output_directoryPath+"/"+filename
+        output_file_path = os.path.join(output_directoryPath, filename)
         number_of_random_orders = 20
 
         # reading content selection output
-        print("summary ....")
         sentences = []
         with io.open(summary_file_path, 'r', encoding='utf8') as inputFile:
             for line in inputFile:
-                sublines = line.split(".")
+                sublines = line.split(". ")
                 for sub in sublines:
                     if sub.strip():
-                       sentences.append(sub.strip())
+                        #sentences.append(line)
+                        sentences.append(sub.strip())
         inputFile.close()
-
+    
         sent_ent_matrix = generateMatrixForSummary(sentences, ner_tagger, stanford_dependency_parser)
 
         if sent_ent_matrix == None:
@@ -59,12 +65,12 @@ def main():
             original_order.append(key)
 
         # generate random ordering
-        print("\n3: random ordering ..")
+        logging.info('Generating random ordering')
         random_orders = generateRandomOrders(original_order, number_of_random_orders)
 
         max_prob = -1
         best_order = []
-
+        
         # generate vectors for random orders
         for random_order in random_orders:
             print(random_order)
@@ -98,11 +104,10 @@ def main():
                     first = False
                     summary = sentences[order]
                     continue
-                summary = summary + ". " + sentences[order]
+                summary = summary + "\n" + sentences[order]
             outputFile.write(summary)
             outputFile.flush()
         outputFile.close()
-
 
 def getFilePath(fileName):
     __location__ = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
@@ -113,8 +118,8 @@ def getDirectoryPath(relativePath):
     return os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(relativePath)))
 
 def loadStanfordNERTagger():
-    tagger_file_path = "src/run_on_patas/english.all.3class.nodistsim.crf.ser.gz"
-    jar_file_path = "src/run_on_patas/stanford-ner.jar"
+    tagger_file_path = "../english.all.3class.nodistsim.crf.ser.gz"
+    jar_file_path = "../stanford-ner.jar"
     return StanfordNERTagger(tagger_file_path, jar_file_path)
 
 def nerSentence(tagger, sentence):
@@ -164,8 +169,8 @@ def clusterNER(nes):
 
 
 def loadStanfordDependencyParser():
-    path_to_jar = 'src/run_on_patas/stanford-parser.jar'
-    path_to_models_jar = 'src/run_on_patas/stanford-parser-3.7.0-models.jar'
+    path_to_jar = '../stanford-parser.jar'
+    path_to_models_jar = '../stanford-parser-3.7.0-models.jar'
     return StanfordDependencyParser(path_to_jar=path_to_jar, path_to_models_jar=path_to_models_jar)
 
 def dependencyParse(dependency_parser, sentence):
@@ -246,7 +251,7 @@ def createFeatureVector(sent_ent_matrix, order):
 
 def generateMatrixForSummary(sentences, ner_tagger, stanford_dep_parser ):
     # mod1: ner of sentence
-    print("\n1: Finding NE ....")
+    logging.info('Finding NE ....')
     all_nes = []
     for sentence in sentences:
         all_nes = all_nes + nerSentence(ner_tagger, sentence)
@@ -454,7 +459,16 @@ class Sent_Extractor(object):
             print(len(all_sentences))
         return all_sentences
 
-main()
+
+def main():
+    logging.info('Running entity reranker')
+    entity_reranker('devtest')
+
+    logging.info('Running entity reranker on eval data')
+    entity_reranker('eval')
+
+if __name__ == '__main__':
+    main()
 #train()
 
 

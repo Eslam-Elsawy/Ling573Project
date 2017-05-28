@@ -47,15 +47,15 @@ def cosine(document1, document2, idf):
 def select_top(dataset = 'training'):
     meta_regex = re.compile(r'^([A-Z]{2,}.{,25}\(.{,25}\))|^([A-Z\s]{2,}(\_|\-))')
     ranked_sentences = pagerank.rank(dataset)
-    input_directoryPath = getDirectoryPath("outputs/pagerank_D3/devtest/")
-    output_directoryPath = getDirectoryPath("outputs/reranker/devtest/")
+    input_directoryPath = os.path.join('outputs/pagerank_D4', dataset)
+    output_directoryPath = os.path.join('outputs/reranker_D4', dataset)
     top_sents = {}
     for topic_id in ranked_sentences.keys():
         sentences = ranked_sentences[topic_id]
         id_part1 = topic_id[:-1]
         id_part2 = topic_id[-1:]
         output_file_name = id_part1 + "-A.M.100." + id_part2 + ".1"
-        output_file_path = output_directoryPath + "/" + output_file_name
+        output_file_path = os.path.join(output_directoryPath, output_file_name)
 
         vocab = set()
         for sentence in sentences:
@@ -127,8 +127,13 @@ def main():
     #logging.info('Ranking training data')
     #select_top('training')
 
+    logging.info('\n\n Running reranker.py \n\n')
+
     logging.info('Ranking devtest data')
     select_top('devtest')
+
+    logging.info('Ranking eval data')
+    select_top('eval')
 
 
 if __name__ == "__main__":
