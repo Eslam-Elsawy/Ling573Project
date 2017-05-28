@@ -4,13 +4,13 @@ Summarization System
 # Run instructions
 ==================
 On patas, go to "/home2/auholmes/Ling573Project" shared directory
-run "condor_submit D3.cmd" command
+run "condor_submit D4.cmd" command
 
 # More details:
 ===============
 The system input is under "/input/topics/devtest" or "/input/topics/training" directories, this input was prepared by running several preprocessing steps on AQUAINT and AQUAINT-2 corpora. The logic for preprocessing can be found under "/src/datasetpreprocessing" directory
 
-The script runs the reorder module "/src/run_on_patas/reorder.py. The output for this module will be under "outputs/D3".
+The script runs the reorder module "/src/run_on_patas/reorder.py. The output for this module will be under "outputs/D4".
 
-The script then runs the evaluation. The output for this is under /evaluation/D3/devtest.
+The script then runs the evaluation. The output for this is under /evaluation/D4.
 
