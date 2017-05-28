@@ -1,7 +1,7 @@
 #!/bin/bash
+export JAVA_HOME=/opt/jdk8/bin/java
 
 python3 src/run_on_patas/reranker.py
-export JAVA_HOME=/opt/jdk8/bin/java
 python3 src/run_on_patas/entitybasedreranker.py
 
 cp outputs/entity_reranker_D4/devtest/* outputs/D4_devtest

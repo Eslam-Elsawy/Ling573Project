@@ -8,6 +8,8 @@ import re
 import sys
 import pagerank
 import nltk
+from nltk.tag.stanford import StanfordNERTagger
+
 THRESHOLD = 0.2
 
 def getFilePath(fileName):
@@ -45,6 +47,24 @@ def cosine(document1, document2, idf):
 
     return float(dot_product) / float(vectorLength(vec1) * vectorLength(vec2))
 
+def loadStanfordNERTagger():
+    tagger_file_path = "../english.all.3class.nodistsim.crf.ser.gz"
+    jar_file_path = "../stanford-ner.jar"
+    return StanfordNERTagger(tagger_file_path, jar_file_path)
+
+def hasNamedEntities(tagger, sentence):
+    nes = tagger.tag(sentence.split())
+    index = 0
+    while index < len(nes):
+        current_word = nes[index][0]
+        current_tag = nes[index][1]
+        if current_tag == "PERSON" or current_tag == "ORGANIZATION" or current_tag == "LOCATION":
+            logging.info('Found Named entity: ' + current_word)
+            return True
+        index += 1
+
+    return False
+
 def compress(sentence):
 
     tokenized = nltk.word_tokenize(sentence.lower())
@@ -73,10 +93,13 @@ def compress(sentence):
     age_regex = re.compile(r', [0-9][0-9],|, aged [0-9][0-9],')
     sentence = re.sub(age_regex, '', sentence)
     sentence = re.sub('  ', ' ', sentence)
+    sentence = re.sub('`', '', sentence)
 
     return sentence
 
 def select_top(dataset = 'training'):
+    ExcludeSentencesWithNoNamedEntities = False
+    ner_tagger = loadStanfordNERTagger()
     meta_regex = re.compile(r'^([A-Z]{2,}.{,25}\(.{,25}\))|^([A-Z\s]{2,}(\_|\-))')
     ranked_sentences = pagerank.rank(dataset)
     input_directoryPath = os.path.join('outputs/pagerank_D4', dataset)
@@ -91,8 +114,6 @@ def select_top(dataset = 'training'):
 
         vocab = set()
         for sentence in sentences:
-
-
             original = sentence.original_sent
             match = re.search(meta_regex, original)
             clean = re.sub(meta_regex, '', original).replace('--', '').lower()
@@ -123,6 +144,7 @@ def select_top(dataset = 'training'):
         total_word_count = 0
         for sent_obj in sentences:
             sentence = sent_obj.clean_sent
+
             if total_word_count + len(sentence.split()) > 100:
                 continue
 
@@ -136,19 +158,26 @@ def select_top(dataset = 'training'):
                     break
 
             if include_sentence:
-                #exclude quotes:
-                if not sent_obj.clean_sent.startswith('\'\'') and not sent_obj.clean_sent.startswith('``'):
-                    chosen_sentences.append(sent_obj)
-                    total_word_count += len(sentence.split())
+                # exclude sentences with no named entities
+                if ExcludeSentencesWithNoNamedEntities and not hasNamedEntities(ner_tagger, sent_obj.original_sent):
+                    logging.info('Ignoring sentence because it does not have named entities')
+                    logging.info('Sentence: ' + sent_obj.original_sent )
+                    continue
+                # exclude quotes
+                if sent_obj.clean_sent.startswith('\'\'') or sent_obj.clean_sent.startswith('``'):
+                    continue
 
-            with io.open(output_file_path,'w', encoding='utf8') as outputFile:
-                for sentence in chosen_sentences:
-                    outputFile.write(sentence.original_sent)
-                    outputFile.write('\n')
-                outputFile.flush()
-            outputFile.close()
+                chosen_sentences.append(sent_obj)
+                total_word_count += len(sentence.split())
 
-            top_sents[topic_id] = chosen_sentences
+        with io.open(output_file_path,'w', encoding='utf8') as outputFile:
+            for sentence in chosen_sentences:
+                outputFile.write(sentence.original_sent)
+                outputFile.write('\n')
+            outputFile.flush()
+        outputFile.close()
+
+        top_sents[topic_id] = chosen_sentences
 
     return top_sents
 
