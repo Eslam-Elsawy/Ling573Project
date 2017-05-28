@@ -5,7 +5,6 @@ import os
 from nltk.tag.stanford import StanfordNERTagger
 from nltk.parse.stanford import StanfordDependencyParser
 from random import randint
-from sklearn import svm
 from bs4 import BeautifulSoup
 import nltk
 from sklearn.neighbors import KNeighborsClassifier
@@ -14,7 +13,7 @@ logging.basicConfig(level = logging.INFO)
 
 def entity_reranker(dataset = 'training'):
     logging.info('Running {} entity reranker'.format(dataset))
-    input_directoryPath = os.path.join('outputs/reorder_D4', dataset)
+    input_directoryPath = os.path.join('outputs/reranker_D4', dataset)
     output_directoryPath = os.path.join('outputs/entity_reranker_D4', dataset)
     model_file_path = '../model'
 
@@ -47,11 +46,7 @@ def entity_reranker(dataset = 'training'):
         sentences = []
         with io.open(summary_file_path, 'r', encoding='utf8') as inputFile:
             for line in inputFile:
-                #sublines = line.split(". ")
-                #for sub in sublines:
-                    #if sub.strip():
                 sentences.append(line)
-                        #sentences.append(sub.strip())
         inputFile.close()
     
         sent_ent_matrix = generateMatrixForSummary(sentences, ner_tagger, stanford_dependency_parser)
@@ -98,14 +93,8 @@ def entity_reranker(dataset = 'training'):
 
         # print best order to the output file
         with io.open(output_file_path, 'w', encoding='utf8') as outputFile:
-            first = True
             for order in best_order:
-                if first:
-                    first = False
-                    summary = sentences[order]
-                    continue
-                summary = summary + "\n" + sentences[order]
-            outputFile.write(summary)
+                outputFile.write(sentences[order].strip() + "\n")
             outputFile.flush()
         outputFile.close()
 
@@ -308,111 +297,6 @@ def tag(cluster, subjects, objects, others):
                 return 'x'
     return '-'
 
-
-def buildPermutations(sentences):
-    sent_len_dic = {}
-    index = 0
-    for s in sentences:
-        sent_len_dic[index] = len(s.split())
-        index += 1
-
-    return buildPermutationsRec(sent_len_dic, 0, [], "")
-
-
-def buildPermutationsRec(sent_len_dic, current_len, history, history_str):
-
-    found_longer = False
-    perms = []
-    for key in sent_len_dic:
-        if key not in history and current_len + sent_len_dic[key] <= 100:
-            found_longer = True
-            new_history = list(history)
-            new_history.append(key)
-            new_history_str = ','.join(str(x) for x in new_history)
-            perms = perms + buildPermutationsRec(sent_len_dic, current_len + sent_len_dic[key], new_history, new_history_str)
-
-    if found_longer:
-        return perms
-    else:
-        return [history_str]
-
-
-def train():
-    number_of_random_orders = 1
-    number_of_files_per_topic = 2
-    TOPICS_DIRECTORY = "input/topics/"
-    #TOPICS_TRAINING_DIRECTORY = TOPICS_DIRECTORY + "/training/"
-    TOPICS_DEVTEST_DIRECTORY = TOPICS_DIRECTORY + "/devtest/"
-
-    #input_directoryPath = getDirectoryPath("../../input/entitygridtraining/gold/training/")
-    output_directoryPath = "outputs/D3_entitybasedreranker/"
-    output_file_path = output_directoryPath + "/model"
-
-    training_samples_vectors = []
-    training_samples_labels = []
-
-    ner_tagger = loadStanfordNERTagger()
-    stanford_dependency_parser = loadStanfordDependencyParser()
-
-    topic_dirs = os.listdir(TOPICS_DEVTEST_DIRECTORY)
-    # get a list of all sentences from a topic directory and their adjacency matrix:
-    for topic_dir in topic_dirs:
-        if(topic_dir.startswith(".")):
-            continue
-        print("Topic: " + topic_dir)
-        path = TOPICS_DEVTEST_DIRECTORY + "/" + topic_dir
-        if os.path.isdir(path):
-            print(path)
-            extractor = Sent_Extractor(path)
-            all_sents = extractor.extract_sentences()
-
-            for i in range(0,number_of_files_per_topic):
-                random_file_index = randint(0, len(all_sents) - 1)
-                print("Random file index = " + str(random_file_index))
-                sentences = all_sents[random_file_index]
-                sent_ent_matrix = generateMatrixForSummary(sentences, ner_tagger, stanford_dependency_parser)
-                if sent_ent_matrix == None:
-                    continue
-
-                # original order
-                original_order = []
-                for key in sent_ent_matrix:
-                    original_order.append(key)
-
-                # generate random ordering
-                print("\n3: random ordering ..")
-                random_orders = generateRandomOrders(original_order, number_of_random_orders)
-
-                # generate vectors for random orders
-                for random_order in random_orders:
-                    print(random_order)
-                    feature_vector = createFeatureVector(sent_ent_matrix, random_order)
-                    training_samples_vectors.append(feature_vector)
-                    training_samples_labels.append(0)
-                    print(feature_vector)
-                    print("\n")
-
-                # generate vector for original order
-                print(original_order)
-                feature_vector = createFeatureVector(sent_ent_matrix, original_order)
-                training_samples_vectors.append(feature_vector)
-                training_samples_labels.append(1)
-                print(feature_vector)
-
-                # print to model file
-                with io.open(output_file_path, 'w', encoding='utf8') as outputFile:
-                    for i in range(0, len(training_samples_vectors)):
-                        vector = training_samples_vectors[i]
-                        label = training_samples_labels[i]
-
-                        outputFile.write(','.join(str(p) for p in vector) +"\n")
-                        outputFile.write(str(label)+"\n")
-                    outputFile.flush()
-                outputFile.close()
-
-        print(training_samples_vectors)
-
-
 def readModel(filePath):
     vectors = []
     labels = []
@@ -469,30 +353,4 @@ def main():
 
 if __name__ == '__main__':
     main()
-#train()
 
-
-# for filename in os.listdir(input_directoryPath):
-
-# if filename.startswith("."):
-#    continue
-# print("Reranking sentences in file: " +filename)
-# input_file_path = input_directoryPath + "/" + filename
-
-# get the output file name
-# id_part1 = filename[:-1]
-# id_part2 = filename[-1:]
-# output_file_name = id_part1 + "-A.M.100." + id_part2 + ".1"
-# output_file_path = output_directoryPath + "/" + output_file_name
-
-
-# reading content selection output
-# print("summary ....")
-# sentences = []
-# with io.open(input_file_path, 'r', encoding='utf8') as inputFile:
-#    for line in inputFile:
-#        sublines = line.split(".")
-#        for sub in sublines:
-#            if sub.strip():
-#               sentences.append(sub)
-# inputFile.close()
