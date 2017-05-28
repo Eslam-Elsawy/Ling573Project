@@ -14,7 +14,7 @@ logging.basicConfig(level = logging.INFO)
 
 def entity_reranker(dataset = 'training'):
     logging.info('Running {} entity reranker'.format(dataset))
-    input_directoryPath = os.path.join('outputs/reranker_D4', dataset)
+    input_directoryPath = os.path.join('outputs/reorder_D4', dataset)
     output_directoryPath = os.path.join('outputs/entity_reranker_D4', dataset)
     model_file_path = '../model'
 
@@ -47,11 +47,11 @@ def entity_reranker(dataset = 'training'):
         sentences = []
         with io.open(summary_file_path, 'r', encoding='utf8') as inputFile:
             for line in inputFile:
-                sublines = line.split(". ")
-                for sub in sublines:
-                    if sub.strip():
-                        #sentences.append(line)
-                        sentences.append(sub.strip())
+                #sublines = line.split(". ")
+                #for sub in sublines:
+                    #if sub.strip():
+                sentences.append(line)
+                        #sentences.append(sub.strip())
         inputFile.close()
     
         sent_ent_matrix = generateMatrixForSummary(sentences, ner_tagger, stanford_dependency_parser)
