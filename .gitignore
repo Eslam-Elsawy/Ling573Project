@@ -33,3 +33,18 @@ src/datasetpreprocessing2/.idea/workspace.xml
 src/datasetpreprocessing2/.idea/misc.xml
 
 src/datasetpreprocessing2/.idea/modules.xml
+
+src/entitybasedreranker/input/*
+src/entitybasedreranker/outputs/*
+
+*.pyc
+
+src/entitybasedreranker/similarity.py
+
+src/entitybasedreranker/reranker.py
+
+src/entitybasedreranker/reorder.py
+
+src/entitybasedreranker/pagerank.py
+
+src/entitybasedreranker/backup.py

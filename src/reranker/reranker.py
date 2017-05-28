@@ -5,9 +5,11 @@ import os
 import math
 import logging
 import re
+import nltk
 import sys
 sys.path.append('../content_selection/')
 import pagerank
+
 THRESHOLD = 0.2
 
 def getFilePath(fileName):
@@ -45,7 +47,36 @@ def cosine(document1, document2, idf):
 
     return float(dot_product) / float(vectorLength(vec1) * vectorLength(vec2))
 
+def compress(sentence):
+
+    tokenized = nltk.word_tokenize(sentence.lower())
+
+    tagged = nltk.pos_tag(tokenized)
+    initial_pos = tagged[0][1]
+    if initial_pos == 'CC' or initial_pos == 'RB':
+        first_space = sentence.index(' ')
+        sentence = sentence[first_space+1:]
+        sentence = sentence[0].upper() + sentence[1:]
+    
+
+
+    said_regex = re.compile(r'(,[^,]*(said|says|according).*?(,(( who).*?(,|\.))?|\.))')
+
+    match = re.search(said_regex, sentence)
+    if match:
+        if match.group(1).endswith('.'):
+            sentence = re.sub(said_regex, '.', sentence)
+                    
+        else:
+            sentence = re.sub(said_regex, ' ', sentence)
+
+    parens_reg = re.compile(r'\(.*?\)')
+    sentence = re.sub(parens_reg, ' ', sentence)
+
+    return sentence
+
 def select_top(dataset = 'training'):
+    print ('selecting top...')
     meta_regex = re.compile(r'^([A-Z]{2,}.{,25}\(.{,25}\))|^([A-Z\s]{2,}(\_|\-))')
     ranked_sentences = pagerank.rank(dataset)
     input_directoryPath = getDirectoryPath("outputs/pagerank_D3/devtest/")
@@ -65,6 +96,7 @@ def select_top(dataset = 'training'):
             original = sentence.original_sent
             match = re.search(meta_regex, original)
             clean = re.sub(meta_regex, '', original).replace('--', '').lower()
+            clean = compress(clean)
             sentence.clean_sent = clean
             splitted = clean.split()
             for word in splitted:
@@ -76,7 +108,7 @@ def select_top(dataset = 'training'):
 
         for sentence in sentences:
             unique_terms = set()
-            for word in sentence.clean_sent.split():
+            for word in sentence.clean_sent.lower().split():
                 unique_terms.add(word)
 
             for word in unique_terms:
@@ -90,32 +122,33 @@ def select_top(dataset = 'training'):
         total_word_count = 0
         for sent_obj in sentences:
             sentence = sent_obj.clean_sent
-            if total_word_count + len(sentence.split()) > 100:
-                continue
+            if len(sentence.strip()) > 0:
+                if total_word_count + len(sentence.split()) > 100:
+                    continue
 
-            # decide whether or not to include the sentence based on the cosine similarity
-            include_sentence = True
-            for chosen_sentence_obj in chosen_sentences:
-                chosen_sentence = chosen_sentence_obj.clean_sent
-                cosine_score = cosine(sentence.lower(), chosen_sentence.lower(), idf)
-                if cosine_score > THRESHOLD:
-                    include_sentence = False
-                    break
+                # decide whether or not to include the sentence based on the cosine similarity
+                include_sentence = True
+                for chosen_sentence_obj in chosen_sentences:
+                    chosen_sentence = chosen_sentence_obj.clean_sent
+                    cosine_score = cosine(sentence.lower(), chosen_sentence.lower(), idf)
+                    if cosine_score > THRESHOLD:
+                        include_sentence = False
+                        break
 
-            if include_sentence:
-                #exclude quotes:
-                if not sent_obj.clean_sent.startswith('\'\'') and not sent_obj.clean_sent.startswith('``'):
-                    chosen_sentences.append(sent_obj)
-                    total_word_count += len(sentence.split())
+                if include_sentence:
+                    #exclude quotes:
+                    if not sent_obj.clean_sent.startswith('\'\'') and not sent_obj.clean_sent.startswith('``') and not sent_obj.clean_sent.startswith('"'):
+                        chosen_sentences.append(sent_obj)
+                        total_word_count += len(sentence.split())
 
-            with io.open(output_file_path,'w', encoding='utf8') as outputFile:
-                for sentence in chosen_sentences:
-                    outputFile.write(sentence.clean_sent)
-                    outputFile.write(' ')
-                outputFile.flush()
-            outputFile.close()
+                with io.open(output_file_path,'w', encoding='utf8') as outputFile:
+                    for sentence in chosen_sentences:
+                        outputFile.write(sentence.clean_sent)
+                        outputFile.write(' ')
+                    outputFile.flush()
+                outputFile.close()
 
-            top_sents[topic_id] = chosen_sentences
+                top_sents[topic_id] = chosen_sentences
 
     return top_sents
 
