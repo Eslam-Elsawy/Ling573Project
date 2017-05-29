@@ -98,7 +98,7 @@ def compress(sentence):
     return sentence
 
 def select_top(dataset = 'training'):
-    ExcludeSentencesWithNoNamedEntities = False
+    ExcludeSentencesWithNoNamedEntities = True
     ner_tagger = loadStanfordNERTagger()
     meta_regex = re.compile(r'^([A-Z]{2,}.{,25}\(.{,25}\))|^([A-Z\s]{2,}(\_|\-))')
     ranked_sentences = pagerank.rank(dataset)

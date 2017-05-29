@@ -197,3 +197,108 @@
 	   Disk (KB)            :     1000     1000    604294
 	   Memory (MB)          :      272     2048      2048
 ...
+000 (87275.000.000) 05/28 18:17:34 Job submitted from host: <192.168.100.50:7211?addrs=192.168.100.50-7211>
+...
+001 (87275.000.000) 05/28 18:17:35 Job executing on host: <192.168.100.52:7999?addrs=192.168.100.52-7999>
+...
+006 (87275.000.000) 05/28 18:17:43 Image size of job updated: 1000
+	2  -  MemoryUsage of job (MB)
+	1776  -  ResidentSetSize of job (KB)
+...
+006 (87275.000.000) 05/28 18:19:42 Image size of job updated: 4652732
+	284  -  MemoryUsage of job (MB)
+	290384  -  ResidentSetSize of job (KB)
+...
+004 (87275.000.000) 05/28 18:19:42 Job was evicted.
+	(0) Job was not checkpointed.
+		Usr 0 00:00:32, Sys 0 00:00:00  -  Run Remote Usage
+		Usr 0 00:00:00, Sys 0 00:00:00  -  Run Local Usage
+	0  -  Run Bytes Sent By Job
+	0  -  Run Bytes Received By Job
+	Partitionable Resources :    Usage  Request Allocated
+	   Cpus                 :                 1         1
+	   Disk (KB)            :     1000     1000    604278
+	   Memory (MB)          :      284     2048      2048
+...
+009 (87275.000.000) 05/28 18:19:42 Job was aborted by the user.
+	via condor_rm (by user auholmes)
+...
+000 (87276.000.000) 05/28 18:20:00 Job submitted from host: <192.168.100.50:7211?addrs=192.168.100.50-7211>
+...
+001 (87276.000.000) 05/28 18:20:01 Job executing on host: <192.168.100.69:61672?addrs=192.168.100.69-61672>
+...
+006 (87276.000.000) 05/28 18:20:09 Image size of job updated: 1000
+	2  -  MemoryUsage of job (MB)
+	1788  -  ResidentSetSize of job (KB)
+...
+006 (87276.000.000) 05/28 18:25:09 Image size of job updated: 4598556
+	306  -  MemoryUsage of job (MB)
+	313260  -  ResidentSetSize of job (KB)
+...
+010 (87276.000.000) 05/28 18:26:30 Job was suspended.
+	Number of processes actually suspended: 3
+...
+006 (87276.000.000) 05/28 18:26:30 Image size of job updated: 4598812
+	306  -  MemoryUsage of job (MB)
+	313260  -  ResidentSetSize of job (KB)
+...
+011 (87276.000.000) 05/28 18:27:26 Job was unsuspended.
+...
+006 (87276.000.000) 05/28 18:30:10 Image size of job updated: 4599740
+	306  -  MemoryUsage of job (MB)
+	313260  -  ResidentSetSize of job (KB)
+...
+010 (87276.000.000) 05/28 18:31:11 Job was suspended.
+	Number of processes actually suspended: 3
+...
+011 (87276.000.000) 05/28 18:32:11 Job was unsuspended.
+...
+010 (87276.000.000) 05/28 18:39:02 Job was suspended.
+	Number of processes actually suspended: 3
+...
+006 (87276.000.000) 05/28 18:39:02 Image size of job updated: 4599884
+	306  -  MemoryUsage of job (MB)
+	313260  -  ResidentSetSize of job (KB)
+...
+011 (87276.000.000) 05/28 18:40:27 Job was unsuspended.
+...
+010 (87276.000.000) 05/28 18:47:45 Job was suspended.
+	Number of processes actually suspended: 3
+...
+011 (87276.000.000) 05/28 18:48:50 Job was unsuspended.
+...
+010 (87276.000.000) 05/28 18:52:35 Job was suspended.
+	Number of processes actually suspended: 3
+...
+011 (87276.000.000) 05/28 18:53:30 Job was unsuspended.
+...
+010 (87276.000.000) 05/28 18:57:27 Job was suspended.
+	Number of processes actually suspended: 3
+...
+011 (87276.000.000) 05/28 18:59:17 Job was unsuspended.
+...
+010 (87276.000.000) 05/28 19:04:30 Job was suspended.
+	Number of processes actually suspended: 3
+...
+011 (87276.000.000) 05/28 19:04:45 Job was unsuspended.
+...
+010 (87276.000.000) 05/28 19:09:31 Job was suspended.
+	Number of processes actually suspended: 3
+...
+011 (87276.000.000) 05/28 19:10:46 Job was unsuspended.
+...
+005 (87276.000.000) 05/28 19:14:04 Job terminated.
+	(1) Normal termination (return value 0)
+		Usr 0 00:04:56, Sys 0 00:01:24  -  Run Remote Usage
+		Usr 0 00:00:00, Sys 0 00:00:00  -  Run Local Usage
+		Usr 0 00:04:56, Sys 0 00:01:24  -  Total Remote Usage
+		Usr 0 00:00:00, Sys 0 00:00:00  -  Total Local Usage
+	0  -  Run Bytes Sent By Job
+	0  -  Run Bytes Received By Job
+	0  -  Total Bytes Sent By Job
+	0  -  Total Bytes Received By Job
+	Partitionable Resources :    Usage  Request Allocated
+	   Cpus                 :                 1         1
+	   Disk (KB)            :     1000     1000   4492662
+	   Memory (MB)          :      306     2048      2048
+...
